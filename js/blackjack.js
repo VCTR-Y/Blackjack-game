@@ -43,7 +43,7 @@ function startGame() {
     playerHand.push(nextCard);
     playerSum = calculateSum(playerHand);
     let cardImg = document.createElement("img");
-    cardImg.src = "PNG-cards-1.3/"+ nextCard + ".png";
+    cardImg.src = "images/PNG-cards-1.3/"+ nextCard + ".png";
     document.getElementById("player-cards").append(cardImg);
   }
     nextCard = deck.pop();
@@ -51,14 +51,14 @@ function startGame() {
     dealerSum = calculateSum(dealerHand);
     let dealerSumHidden = dealerSum;
     let cardImg = document.createElement('img');
-    cardImg.src = "PNG-cards-1.3/" + nextCard + ".png";
+    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
     document.getElementById('dealer-cards').append(cardImg);
 
     nextCard = deck.pop();
     dealerHand.push(nextCard);
     dealerSum = calculateSum(dealerHand);
     cardImg = document.createElement('img');
-    cardImg.src = "PNG-cards-1.3/BACK.png";
+    cardImg.src = "images/PNG-cards-1.3/BACK.png";
     document.getElementById('dealer-cards').append(cardImg);
 
     document.querySelector('.dealer-sum').innerHTML = dealerSumHidden;
@@ -144,7 +144,7 @@ function hit() {
     playerHand.push(nextCard);
     playerSum = calculateSum(playerHand);
     let cardImg = document.createElement('img');
-    cardImg.src = "PNG-cards-1.3/" + nextCard + ".png";
+    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
     document.getElementById("player-cards").append(cardImg);
     document.querySelector('.player-sum').innerHTML = playerSum;
 
@@ -160,7 +160,7 @@ function stand() {
   let backCard = document.getElementById("dealer-cards");
   document.getElementById("dealer-cards").removeChild(backCard.lastChild);
   let hiddenCard = document.createElement("img");
-  hiddenCard.src = "PNG-cards-1.3/" + dealerHand[1] + ".png";
+  hiddenCard.src = "images/PNG-cards-1.3/" + dealerHand[1] + ".png";
   document.getElementById("dealer-cards").append(hiddenCard)
   document.querySelector('.dealer-sum').innerHTML = dealerSum;
 
@@ -182,7 +182,7 @@ function dealerDraw() {
   dealerHand.push(nextCard);
   dealerSum = calculateSum(dealerHand);
   let cardImg = document.createElement("img");
-  cardImg.src = "PNG-cards-1.3/" + nextCard + ".png";
+  cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
   document.getElementById("dealer-cards").append(cardImg);
   document.querySelector('.dealer-sum').innerHTML = dealerSum;
 
