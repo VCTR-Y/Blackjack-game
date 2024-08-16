@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack</title>
+  <link rel="icon" href="icon.webp" type = "image/png">
+  <link rel="stylesheet" href="blackjack.css">
+  <script src="blackjack.js"></script>
+</head>
+<body>
+  <h1 class="header">Dealer</h1>
+  <div id="dealer-cards" class="dealer"></div>
+  <div class="sum-container">
+    <p class="dealer-sum"></p>
+  </div>
+
+  <h1 class="header">Player</h1>
+  <div id="player-cards" class="player"></div>
+  <div class="sum-container">
+    <p class="player-sum"></p>
+  </div>
+
+  <div class="result-container">
+    <p class="result"></p>
+  </div>
+
+  <div class="balance-container">
+    <p class="bal"></p>
+    <input id="input" type="number" value = 0>
+    <button id="bet" onclick="placeBet()" class="bet-button">Bet</button>
+  </div>
+
+  <div class="button-container">
+    <button onclick="double()" id="double" class="double-button">Double</button>
+    <button onclick="hit()" id="hit" class="hit-button">Hit</button>
+    <button onclick="stand()" id="stand" class="stand-button">Stand</button>
+    <button onclick="split()" id="split" class="split-button">Split</button>
+  </div>
+
+  <button onclick="playMusic()" class="music-button">Music</button>
+
+</body>
+</html>
