@@ -46,23 +46,23 @@ function startGame() {
     cardImg.src = "images/PNG-cards-1.3/"+ nextCard + ".png";
     document.getElementById("player-cards").append(cardImg);
   }
-    nextCard = deck.pop();
-    dealerHand.push(nextCard);
-    dealerSum = calculateSum(dealerHand);
-    let dealerSumHidden = dealerSum;
-    let cardImg = document.createElement('img');
-    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
-    document.getElementById('dealer-cards').append(cardImg);
+  nextCard = deck.pop();
+  dealerHand.push(nextCard);
+  dealerSum = calculateSum(dealerHand);
+  let dealerSumHidden = dealerSum;
+  let cardImg = document.createElement('img');
+  cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+  document.getElementById('dealer-cards').append(cardImg);
 
-    nextCard = deck.pop();
-    dealerHand.push(nextCard);
-    dealerSum = calculateSum(dealerHand);
-    cardImg = document.createElement('img');
-    cardImg.src = "images/PNG-cards-1.3/BACK.png";
-    document.getElementById('dealer-cards').append(cardImg);
+  nextCard = deck.pop();
+  dealerHand.push(nextCard);
+  dealerSum = calculateSum(dealerHand);
+  cardImg = document.createElement('img');
+  cardImg.src = "images/PNG-cards-1.3/BACK.png";
+  document.getElementById('dealer-cards').append(cardImg);
 
-    document.querySelector('.dealer-sum').innerHTML = dealerSumHidden;
-    document.querySelector('.player-sum').innerHTML = playerSum;
+  document.querySelector('.dealer-sum').innerHTML = dealerSumHidden;
+  document.querySelector('.player-sum').innerHTML = playerSum;
 }
 
 function placeBet() {
@@ -220,8 +220,13 @@ function getResult() {
   } else if (playerSum < dealerSum) {
     document.querySelector('.result').innerHTML = "You lose!";
   } else {
-    document.querySelector('.result').innerHTML = "Push!";
-    balance += bet;
+    if (checkBlackJack()) {
+      balance += bet * 2.5;
+      document.querySelector('.result').innerHTML = "You win!";
+    } else {
+      document.querySelector('.result').innerHTML = "Push!";
+      balance += bet;
+    }
     document.querySelector('.bal').innerHTML = "Balance: $" + balance;
   }
 }
