@@ -139,6 +139,7 @@ function double() {
 }
 
 function hit() {
+  document.getElementById('double').disabled = true;
   if (playerSum < 21) {
     let nextCard = deck.pop();
     playerHand.push(nextCard);
