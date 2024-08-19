@@ -66,16 +66,18 @@ function startGame() {
 }
 
 function placeBet() {
-  bet = parseInt(document.getElementById('input').value, 10);
+  bet = document.getElementById('input').value;
+  if (bet === '') {
+    alert("Please place a bet first!");
+    return;
+  }
+  bet = parseInt(bet, 10);
   console.log(bet);
   if (balance === 0) {
     alert("You're out of money");
     return;
   } else if (bet < 0) {
     alert("Your bet can't be negative!");
-    return;
-  } else if (bet === '') {
-    alert("Please place a bet first!");
     return;
   } else if (bet > balance) {
     alert("You can't bet more than your balance!");
@@ -174,8 +176,10 @@ function stand() {
   document.getElementById('bet').disabled = false;
 }
 
+// TO DO
 function split() {
-  // TODO
+  document.querySelector('.player-cards').innerHTML = 
+  ` `;
 }
 
 function dealerDraw() {
