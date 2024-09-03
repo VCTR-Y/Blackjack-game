@@ -17,7 +17,7 @@ body {
 }
 
 #dealer-cards, #player-cards, img {
-  border-radius: 5px;
+  /* border: 1px solid lightgray; */
   padding: 1px;
 }
 
@@ -29,8 +29,28 @@ body {
   height: 225px;
 }
 
+.player-cards-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+#split1-cards {
+  margin-right: 50px;
+  padding: 1px;
+}
+
+#split2-cards {
+  /* border: 3px solid yellow; */
+  margin-left: 50px;
+  padding: 1px;
+}
+
 .sum-container {
-  display: inline-block;
+  display: flex;
+  justify-content: space-around;
+}
+
+#dealer-sum-container, #player-sum-container {
   width: 48px;
   height: 48px;
   border-radius: 25%;
@@ -40,10 +60,6 @@ body {
   border-color: white;
   background-color: rgb(0, 0, 0, 0.5);
   color: white;
-}
-
-.dealer-sum, .player-sum {
-  font-size: 16px;
 }
 
 .balance-container {
@@ -59,7 +75,7 @@ body {
 }
 
 #input {
-  width: 100px;
+  width: 125px;
   height: 24px;
   border-radius: 5px;
   margin-left: 10px;
@@ -101,21 +117,16 @@ button {
   color: cyan;
 }
 
-/* .reset-button {
-  color: green;
-} */
-
-.result {
-  position: absolute;
-  bottom: 125px;
-  left: 0;
-  right: 0;
-  font-size: 32px;
+.split1-result, .main-result, .split2-result {
+  font-size: 28px;
   color: white;
 }
 
 .result-container {
+  display: flex;
+  justify-content: space-around;
   height: 24px;
+  margin-bottom: 10px;
 }
 
 .music-button {
@@ -123,6 +134,6 @@ button {
   font-size: 12px;
   top: 10px;;
   left: 10px;;
-  height: 20px;
-  width: 50px;
+  height: 40px;
+  width: 100px;
 }

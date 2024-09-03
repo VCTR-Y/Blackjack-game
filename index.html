@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blackjack</title>
-  <link rel="icon" href="icon.webp" type = "image/png">
+  <link rel="icon" href="Images/icon.webp" type = "image/png">
   <link rel="stylesheet" href="css/styles.css">
   <script src="js/blackjack.js"></script>
 </head>
@@ -12,22 +12,44 @@
   <h1 class="header">Dealer</h1>
   <div id="dealer-cards" class="dealer"></div>
   <div class="sum-container">
-    <p class="dealer-sum"></p>
+    <div id="dealer-sum-container">
+      <p class="dealer-sum"></p>
+    </div>
   </div>
 
   <h1 class="header">Player</h1>
-  <div id="player-cards" class="player"></div>
+  <div class="player-cards-container">
+    <div id="split1-cards" class="player"></div>
+    <div id="player-cards" class="player"></div>
+    <div id="split2-cards" class="player"></div>
+  </div>
   <div class="sum-container">
-    <p class="player-sum"></p>
+    <div id="split1-sum-container">
+      <p class="split1-sum"></p>
+    </div>
+    <div id="player-sum-container">
+      <p class="player-sum"></p>
+    </div>
+    <div id="split2-sum-container">
+      <p class="split2-sum"></p>
+    </div>
   </div>
 
   <div class="result-container">
-    <p class="result"></p>
+    <div class="split1-result-container">
+      <p class="split1-result"></p>
+    </div>
+    <div class="main-result-container">
+      <p class="main-result"></p>
+    </div>
+    <div class="split2-result-container">
+      <p class="split2-result"></p>
+    </div>
   </div>
 
   <div class="balance-container">
     <p class="bal"></p>
-    <input id="input" type="number" value = 0>
+    <input id="input" type="number" placeholder="Bet Amount">
     <button id="bet" onclick="placeBet()" class="bet-button">Bet</button>
   </div>
 
@@ -38,7 +60,7 @@
     <button onclick="split()" id="split" class="split-button">Split</button>
   </div>
 
-  <button onclick="playMusic()" class="music-button">Music</button>
+  <button onclick="playMusic()" class="music-button">Play Music</button>
 
 </body>
 </html>

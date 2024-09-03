@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function() {
   createDeck();
   document.querySelector('.bal').innerHTML = "Balance: $" +  balance;
   disableButtons();
-  document.getElementById('split').disabled = true;
 })
 
 const val = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -12,11 +11,18 @@ let dealerSum = 0;
 let dealerHand = [];
 let playerSum = 0;
 let playerHand = [];
+let splitHand1 = [];
+let splitSum1 = 0;
+let splitHand2 = [];
+let splitSum2 = 0;
 let dealerDrawInterval;
 let doubleTimeout;
 let balance = 1000;
 let bet = 0;
-const audio = new Audio('music.mp3');
+let isSplit = false;
+let splitStand2 = false;
+let splitStand1 = false;
+const audio = new Audio('audio/music.mp3');
 audio.loop = true;
 
 function createDeck() {
@@ -39,7 +45,7 @@ function shuffle() {
 
 function startGame() {
   for (let i = 0; i < 2; i++) {
-    nextCard = deck.pop();
+    let nextCard = deck.pop();
     playerHand.push(nextCard);
     playerSum = calculateSum(playerHand);
     let cardImg = document.createElement("img");
@@ -92,6 +98,10 @@ function placeBet() {
     document.getElementById('double').disabled = false;
   }
   document.getElementById('bet').disabled = true
+
+  if (getVal(playerHand[0]) === getVal(playerHand[1]) && bet < balance) {
+    document.getElementById('split').disabled = false;
+  }
 }
 
 function calculateSum(hand) {
@@ -141,18 +151,63 @@ function double() {
 }
 
 function hit() {
-  document.getElementById('double').disabled = true;
-  if (playerSum < 21) {
-    let nextCard = deck.pop();
-    playerHand.push(nextCard);
-    playerSum = calculateSum(playerHand);
-    let cardImg = document.createElement('img');
-    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
-    document.getElementById("player-cards").append(cardImg);
-    document.querySelector('.player-sum').innerHTML = playerSum;
+  if (isSplit) {
+    if (splitStand2) {
+      let nextCard = deck.pop();
+      splitHand1.push(nextCard);
+      splitSum1 = calculateSum(splitHand1);
+      let cardImg = document.createElement("img");
+      cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+      document.getElementById("split1-cards").append(cardImg);
+      document.querySelector('.split1-sum').innerHTML = splitSum1;
+      checkBust();
+    } else {
+      if (splitSum2 <= 21) {
+        let nextCard = deck.pop();
+        splitHand2.push(nextCard);
+        splitSum2 = calculateSum(splitHand2);
+        let cardImg = document.createElement("img");
+        cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+        document.getElementById("split2-cards").append(cardImg);
+        document.querySelector('.split2-sum').innerHTML = splitSum2;
+        checkBust();
+      }
+    }
+  } else {
+    document.getElementById('double').disabled = true;
+    document.getElementById('split').disabled = true;
+    if (playerSum <= 21) {
+      let nextCard = deck.pop();
+      playerHand.push(nextCard);
+      playerSum = calculateSum(playerHand);
+      let cardImg = document.createElement('img');
+      cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+      document.getElementById("player-cards").append(cardImg);
+      document.querySelector('.player-sum').innerHTML = playerSum;
+      checkBust();
+    }
+  }
+}
 
+function checkBust() {
+  if (isSplit) {
+    if (splitStand2 === false && splitSum2 > 21) {
+      document.querySelector('.split2-result').innerHTML = "BUST!";
+      splitStand2 = true;
+      document.getElementById("split2-cards").style.setProperty("border", "none")
+      document.getElementById("split1-cards").style.setProperty("border", "3px solid yellow")
+    } else if (splitSum1 > 21) {
+      document.querySelector('.split1-result').innerHTML = "BUST!";
+      document.getElementById("split1-cards").style.setProperty("border", "none")
+      if (document.querySelector('.split2-result').innerHTML === "BUST!" && document.querySelector('.split1-result').innerHTML === "BUST!") {
+        document.querySelector('.main-result').innerHTML = "You Lose!";
+        return;
+      }
+      stand();
+    }
+  } else {
     if (playerSum > 21) {
-      document.querySelector('.result').innerHTML = "BUST! You lose";
+      document.querySelector('.main-result').innerHTML = "BUST! You lose";
       disableButtons();
       document.getElementById('bet').disabled = false;
     }
@@ -160,6 +215,16 @@ function hit() {
 }
 
 function stand() {
+  if (isSplit) {
+    if (splitStand2 === false) {
+      splitStand2 = true;
+      document.getElementById("split2-cards").style.setProperty("border", "none")
+      document.getElementById("split1-cards").style.setProperty("border", "3px solid yellow")
+      return;
+    } else if (splitStand1 === false) {
+      document.getElementById("split1-cards").style.setProperty("border", "none")
+    } 
+  }
   let backCard = document.getElementById("dealer-cards");
   document.getElementById("dealer-cards").removeChild(backCard.lastChild);
   let hiddenCard = document.createElement("img");
@@ -170,16 +235,93 @@ function stand() {
   if (dealerSum < 17) {
     dealerDrawInterval = setInterval(dealerDraw, 750);
   } else {
-    getResult();
+    if (isSplit) {
+      getSplitResult()
+    } else {
+      getResult();
+    }
   }
   disableButtons();
-  document.getElementById('bet').disabled = false;
 }
 
-// TO DO
 function split() {
-  document.querySelector('.player-cards').innerHTML = 
-  ` `;
+  isSplit = true;
+  balance -= bet;
+  bet *= 2;
+  document.querySelector('.bal').innerHTML = "Balance: $" +  balance;
+
+  removePlayerSumContainer("player");
+  addSumContainer("split1");
+  addSumContainer("split2");
+  document.getElementById("split2-cards").style.setProperty("border", "3px solid yellow")
+
+  document.querySelector(".player-sum").innerHTML= '';
+
+  let secondCard = playerHand.pop();
+  let firstCard = playerHand.pop();
+  splitHand1.push(firstCard);
+  splitHand2.push(secondCard);
+
+  document.getElementById("player-cards").innerHTML = '';
+
+  let cardImg = document.createElement('img');
+  cardImg.src = "images/PNG-cards-1.3/" + firstCard + ".png";
+  document.getElementById("split1-cards").append(cardImg);
+
+  cardImg = document.createElement('img');
+  cardImg.src = "images/PNG-cards-1.3/" + secondCard + ".png";
+  document.getElementById("split2-cards").append(cardImg);
+
+  splitSum1 = calculateSum(splitHand1);
+  splitSum2 = calculateSum(splitHand2);
+  document.querySelector('.split1-sum').innerHTML = splitSum1;
+  document.querySelector('.split2-sum').innerHTML = splitSum2;
+
+  disableButtons();
+  dealSplitCards();
+}
+
+function dealSplitCards() {
+  setTimeout(() => {
+    let nextCard = deck.pop();
+    splitHand2.push(nextCard);
+    splitSum2 = calculateSum(splitHand2);
+    cardImg = document.createElement("img");
+    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+    document.getElementById("split2-cards").append(cardImg);
+    document.querySelector('.split2-sum').innerHTML = splitSum2;
+  }, 750)
+
+  setTimeout(() => {
+    nextCard = deck.pop();
+    splitHand1.push(nextCard);
+    splitSum1 = calculateSum(splitHand1);
+    cardImg = document.createElement("img");
+    cardImg.src = "images/PNG-cards-1.3/" + nextCard + ".png";
+    document.getElementById("split1-cards").append(cardImg);
+    document.querySelector('.split1-sum').innerHTML = splitSum1;
+    enableButtons();
+    document.getElementById('double').disabled = true;
+  }, 750)
+
+}
+
+function removePlayerSumContainer(name) {
+  document.getElementById(name + "-sum-container").style.setProperty("width", 0);
+  document.getElementById(name + "-sum-container").style.setProperty("height", 0);
+  document.getElementById(name + "-sum-container").style.setProperty("border", "none");
+}
+
+function addSumContainer(name) {
+  document.getElementById(name + "-sum-container").style.setProperty("width", "48px");
+  document.getElementById(name + "-sum-container").style.setProperty("height", "48px");
+  document.getElementById(name + "-sum-container").style.setProperty("border-radius", "25%");
+  document.getElementById(name + "-sum-container").style.setProperty("border", "solid");
+  document.getElementById(name + "-sum-container").style.setProperty("border-color", "white");
+  document.getElementById(name + "-sum-container").style.setProperty("border-width", "2px");
+  document.getElementById(name + "-sum-container").style.setProperty("margin-top", "10px");
+  document.getElementById(name + "-sum-container").style.setProperty("background-color", "rgb(0, 0, 0, 0.5)");
+  document.getElementById(name + "-sum-container").style.setProperty("color", "white");
 }
 
 function dealerDraw() {
@@ -193,29 +335,33 @@ function dealerDraw() {
 
   if (dealerSum >= 17) {
     clearInterval(dealerDrawInterval);
-    getResult();
+    if (isSplit) {
+      getSplitResult();
+    } else {
+      getResult();
+    }
   }
 }
 
 function getResult() {
   if (dealerSum > 21) {
-    document.querySelector('.result').innerHTML = "Dealer busts, you win!";
+    document.querySelector('.main-result').innerHTML = "Dealer busts, you win!";
     if (checkBlackJack()) {
       balance += bet * 2.5;
     } else {
       balance += bet * 2;
     }
     document.querySelector('.bal').innerHTML = "Balance: $" +  balance;
-  } else if ((dealerSum == 21) && (dealerHand.length == 2)) {
-    if ((playerSum == 21) && (playerHand.length == 2)) {
-      document.querySelector('.result').innerHTML = "Dealer has Blackjack! Push!";
+  } else if (dealerSum === 21 && dealerHand.length === 2) {
+    if (playerSum === 21 && playerHand.length === 2) {
+      document.querySelector('.main-result').innerHTML = "Dealer has Blackjack! Push!";
       balance += bet;
       document.querySelector('.bal').innerHTML = "Balance: $" + balance;
     } else {
-      document.querySelector('.result').innerHTML = "Dealer has Blackjack! You lose!";
+      document.querySelector('.main-result').innerHTML = "Dealer has Blackjack! You lose!";
     }
   } else if (playerSum > dealerSum) {
-    document.querySelector('.result').innerHTML = "You win!";
+    document.querySelector('.main-result').innerHTML = "You win!";
     if (checkBlackJack()) {
       balance += bet * 2.5;
     } else {
@@ -223,17 +369,91 @@ function getResult() {
     }
     document.querySelector('.bal').innerHTML = "Balance: $" + balance;
   } else if (playerSum < dealerSum) {
-    document.querySelector('.result').innerHTML = "You lose!";
+    document.querySelector('.main-result').innerHTML = "You lose!";
   } else {
     if (checkBlackJack()) {
       balance += bet * 2.5;
-      document.querySelector('.result').innerHTML = "You win!";
+      document.querySelector('.main-result').innerHTML = "You win!";
     } else {
-      document.querySelector('.result').innerHTML = "Push!";
+      document.querySelector('.main-result').innerHTML = "Push!";
       balance += bet;
     }
     document.querySelector('.bal').innerHTML = "Balance: $" + balance;
   }
+  document.getElementById('bet').disabled = false;
+}
+
+function getSplitResult() {
+  if (document.querySelector('.split2-result').innerHTML === "BUST!") {
+    if (dealerSum > 21) {
+      document.querySelector('.split1-result').innerHTML = "Dealer busts, you win!";
+      balance += bet;
+    } else if (splitSum1 > dealerSum) {
+      document.querySelector('.split1-result').innerHTML = "You win!";
+      balance += bet;
+    } else if (splitSum1 < dealerSum) {
+      document.querySelector('.split1-result').innerHTML = "You lose!";
+    } else if (dealerSum === 21 && dealerHand.length === 2) {
+      document.querySelector('.split1-result').innerHTML = "Dealer has Blackjack! You lose!";
+    } else {
+      document.querySelector('.split1-result').innerHTML = "Push!";
+      balance += bet / 2;
+    }
+    document.querySelector('.bal').innerHTML = "Balance: $" + balance;
+  } else if (document.querySelector('.split1-result').innerHTML === "BUST!") {
+    if (dealerSum > 21) {
+      document.querySelector('.split2-result').innerHTML = "Dealer busts, you win!";
+      balance += bet;
+    } else if (splitSum2 > dealerSum) {
+      document.querySelector('.split2-result').innerHTML = "You win!";
+      balance += bet;
+    } else if (splitSum2 < dealerSum) {
+      document.querySelector('.split2-result').innerHTML = "You lose!";
+    } else if (dealerSum === 21 && dealerHand.length === 2) {
+      document.querySelector('.split2-result').innerHTML = "Dealer has Blackjack! You lose!";
+    } else {
+      document.querySelector('.split2-result').innerHTML = "Push!";
+      balance += bet / 2;
+    }
+    document.querySelector('.bal').innerHTML = "Balance: $" + balance;
+  } else {
+    if (dealerSum > 21) {
+      document.querySelector('.split2-result').innerHTML = "Dealer busts, you win!";
+      document.querySelector('.split1-result').innerHTML = "Dealer busts, you win!";
+      balance += bet * 2;
+      document.querySelector('.bal').innerHTML = "Balance: $" + balance;
+      return;
+    }
+    if (dealerSum === 21 && dealerHand.length === 2) {
+      document.querySelector('.split2-result').innerHTML = "Dealer has Blackjack! You lose!";
+      document.querySelector('.split1-result').innerHTML = "Dealer has Blackjack! You lose!";
+      return;
+    }
+    if (splitSum2 > dealerSum) {
+      document.querySelector('.split2-result').innerHTML = "You win!";
+      balance += bet;
+    }
+    if (splitSum1 > dealerSum) {
+      document.querySelector('.split1-result').innerHTML = "You win!";
+      balance += bet;
+    }
+    if (splitSum2 < dealerSum) {
+      document.querySelector('.split2-result').innerHTML = "You lose!";
+    }
+    if (splitSum1 < dealerSum) {
+      document.querySelector('.split1-result').innerHTML = "You lose!";
+    }
+    if (splitSum2 == dealerSum) {
+      document.querySelector('.split2-result').innerHTML = "Push!";
+      balance += bet / 2;
+    }
+    if (splitSum1 == dealerSum) {
+      document.querySelector('.split1-result').innerHTML = "Push!";
+      balance += bet / 2;
+    }
+    document.querySelector('.bal').innerHTML = "Balance: $" + balance;
+  }
+  document.getElementById('bet').disabled = false;
 }
 
 function checkBlackJack() {
@@ -247,11 +467,27 @@ function reset() {
   clearTimeout(doubleTimeout);
   document.getElementById('player-cards').innerHTML = '';
   document.getElementById('dealer-cards').innerHTML = '';
-  document.querySelector('.result'). innerHTML = '';
+  document.getElementById('split1-cards').innerHTML = '';
+  document.getElementById('split2-cards').innerHTML = '';
+  document.querySelector('.split1-result').innerHTML = '';
+  document.querySelector('.main-result'). innerHTML = '';
+  document.querySelector('.split2-result').innerHTML = '';
+  document.querySelector('.split1-sum').innerHTML = '';
+  document.querySelector('.player-sum'). innerHTML = '';
+  document.querySelector('.split2-sum').innerHTML = '';
+  removePlayerSumContainer('split1');
+  removePlayerSumContainer('split2');
+  addSumContainer('player');
   dealerSum = 0;
   dealerHand = [];
   playerSum = 0;
   playerHand = [];
+  splitHand1 = [];
+  splitHand2 = [];
+  splitSum1 = 0;
+  splitSum2 = 0;
+  isSplit = false;
+  splitStand2 = false;
   deck = [];
   createDeck();
   startGame();
@@ -262,6 +498,7 @@ function disableButtons() {
   document.getElementById('double').disabled = true;
   document.getElementById('hit').disabled = true;
   document.getElementById('stand').disabled = true;
+  document.getElementById('split').disabled = true;
 }
 
 function enableButtons() {
@@ -271,10 +508,13 @@ function enableButtons() {
 }
 
 function playMusic() {
+  const musicButton = document.querySelector('.music-button');
   if (audio.paused) {
     audio.play();
+    musicButton.innerHTML = "Pause Music";
   } else {
     audio.pause();
+    musicButton.innerHTML = "Play Music";
   }
 }
 
