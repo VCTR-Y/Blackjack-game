@@ -17,7 +17,6 @@ body {
 }
 
 #dealer-cards, #player-cards, img {
-  /* border: 1px solid lightgray; */
   padding: 1px;
 }
 
@@ -40,7 +39,6 @@ body {
 }
 
 #split2-cards {
-  /* border: 3px solid yellow; */
   margin-left: 50px;
   padding: 1px;
 }
@@ -94,6 +92,10 @@ button {
   width: 150px;
   font-size: 24px;
   border-radius: 16px;
+}
+
+button:hover {
+  opacity: 0.9;
 }
 
 .button-container {
