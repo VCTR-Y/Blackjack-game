@@ -422,11 +422,13 @@ function getSplitResult() {
       document.querySelector('.split1-result').innerHTML = "Dealer busts, you win!";
       balance += bet * 2;
       document.querySelector('.bal').innerHTML = "Balance: $" + balance;
+      document.getElementById('bet').disabled = false;
       return;
     }
     if (dealerSum === 21 && dealerHand.length === 2) {
       document.querySelector('.split2-result').innerHTML = "Dealer has Blackjack! You lose!";
       document.querySelector('.split1-result').innerHTML = "Dealer has Blackjack! You lose!";
+      document.getElementById('bet').disabled = false;
       return;
     }
     if (splitSum2 > dealerSum) {
